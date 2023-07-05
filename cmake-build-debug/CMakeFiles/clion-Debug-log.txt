@@ -1,4 +1,4 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S "/Users/macbook/Documents/new game/bagels" -B "/Users/macbook/Documents/new game/bagels/cmake-build-debug"
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" -S "/Users/macbook/Documents/new game/bagels" -B "/Users/macbook/Documents/new game/bagels/cmake-build-debug"
 -- The C compiler identification is AppleClang 14.0.3.14030022
 -- The CXX compiler identification is AppleClang 14.0.3.14030022
 -- Detecting C compiler ABI info
