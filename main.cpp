@@ -126,9 +126,8 @@ int main() {
                     aim[i - 1] = fermi_number;
                     pico_number = pico(guess_number, user_number, number_of_digit);
                     near[i - 1] = pico_number - fermi_number;
-                    int a = 0;
-                    if (i > 6) a = i - 6;
-                    for (int l = a; l < i; l++) {
+
+                    for (int l = 0; l < i; l++) {
                         std::cout << "В цель = " << aim[l] << "   " << save_number[l] << "   " << "Рядом = "<< near[l] << "\n";
                     }
                 }
