@@ -1,0 +1,2 @@
+/Users/macbook/Documents/new game/bagels/cmake-build-release/CMakeFiles/edit_cache.dir
+/Users/macbook/Documents/new game/bagels/cmake-build-release/CMakeFiles/rebuild_cache.dir

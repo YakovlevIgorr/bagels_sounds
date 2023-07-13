@@ -12,11 +12,7 @@
 						"string" : "3.25"
 					},
 					"projectIndex" : 0,
-					"source" : ".",
-					"targetIndexes" : 
-					[
-						0
-					]
+					"source" : "."
 				}
 			],
 			"name" : "Debug",
@@ -27,23 +23,10 @@
 					[
 						0
 					],
-					"name" : "bagels",
-					"targetIndexes" : 
-					[
-						0
-					]
+					"name" : "bagels"
 				}
 			],
-			"targets" : 
-			[
-				{
-					"directoryIndex" : 0,
-					"id" : "bagels::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-bagels-Debug-1b954b382224811a7bf0.json",
-					"name" : "bagels",
-					"projectIndex" : 0
-				}
-			]
+			"targets" : []
 		}
 	],
 	"kind" : "codemodel",

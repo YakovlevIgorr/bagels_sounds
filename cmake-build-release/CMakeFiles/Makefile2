@@ -57,7 +57,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = "/Users/macbook/Documents/new game/bagels"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/macbook/Documents/new game/bagels/cmake-build-debug"
+CMAKE_BINARY_DIR = "/Users/macbook/Documents/new game/bagels/cmake-build-release"
 
 #=============================================================================
 # Directory level rules for the build root directory

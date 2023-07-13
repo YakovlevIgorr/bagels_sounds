@@ -29,11 +29,18 @@ int pico(std::string guess_number, std::string usr_number, int number_of_digits)
     return count;
 }
 
-bool input_usr(std::string input, int number_of_digit){
-    if((input.size() == number_of_digit) && (all_of(input.begin(), input.end(), ::isdigit))){
-        return true;
-    }
-    return false;
+bool input_usr(std::string input, int number_of_digit = 1){
+    bool flag = true;
+    char* check_input = const_cast<char*>(input.c_str());
+    if(input.size() == number_of_digit) {
+        for (int i = 0; i < strlen(check_input); i++) {
+            if(!isdigit(check_input[i])) {
+                flag = false;
+            }
+        }
+    }else flag = false;
+    return flag;
+
 } //проверка на правильность ввода
 
 std::string random_guess(int number_of_digit){
@@ -60,7 +67,7 @@ int main() {
         std::cout << "1. Начать игру\n2. Правила игры\n3. Об авторе\n4. Выход\n";
         getline(std::cin, start);
         if (start == "3") {
-            std::cout << "Автор: Яковлев Игорь\nВерсия 1.0\nСовместно с Dialas\n";
+            std::cout << "Автор: Яковлев Игорь\nВерсия 1.0\nСовместно с Dialas\n\n";
         }
         if(start == "2"){
             std::cout << "Компьютер загадывает несколько цифр, количество цифр задает игрок. После каждой "
@@ -69,7 +76,7 @@ int main() {
                          "ее место угадано, (звук3) - нет таких цифр. Пользователю даеться 20 попыток. "
                          "Существует несколько стратегий для успешного прохождения этой игры. Опытный игрок"
                          " проходит игру в среднем за 9 попыток. Находи их и выигрывай! Если надоест набери 00000.\n"
-                         "Удачи Homo Sapiens!\n";
+                         "Удачи Homo Sapiens!\n\n";
         }
     }
 
@@ -89,7 +96,7 @@ int main() {
                 std::cout << "Какое количество цифр желаете отгадывать? Не более 9. ";
                 getline(std::cin, string_number_of_digit);
 
-                if (all_of(string_number_of_digit.begin(), string_number_of_digit.end(), ::isdigit)) {
+                if (input_usr(string_number_of_digit)) {
                     number_of_digit = std::stoi(string_number_of_digit);
                 } else {
                     std::cout << "Попробуйте еще раз.\n";
