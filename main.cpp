@@ -18,24 +18,45 @@
 
 //наш звуковой движок
 static ma_engine snd_engine;
-
+static ma_sound g_curr_sound;
 //инициализация звука
-bool initSound()
+bool initSound(int volume = 1)
 {
     ma_result result = ma_engine_init(NULL, &snd_engine);
     if (result != MA_SUCCESS) {
         std::cout << "Failed init sound engine\n";
         return false;  // Failed to initialize the engine.
     }
+    //ma_engine_set_volume(&snd_engine, volume); //1.0 - громкость всех звуков 100%
+    //0.5 - громкость всех звуков 50%
+    //0.0 - звук выключен
     return true;
 }
+
+void music_volume(float volume) {
+    ma_engine_set_volume(&snd_engine, volume); //1.0 - громкость всех звуков 100%
+    //0.5 - громкость всех звуков 50%
+    //0.0 - звук выключен
+}
+
 
 //играем мелодию
 void playSound(std::string sound_file_name)
 {
     ma_result result = ma_engine_play_sound(&snd_engine, sound_file_name.c_str(), NULL);
     if (result != MA_SUCCESS) {
-        std::cout << "Failed play sound "<< sound_file_name<<"\n";
+        std::cout << "Failed play sound " << sound_file_name << "\n";
+    }
+}
+void playSoundWithVolume(std::string sound_file_name, float volume_rel) {
+    ma_result result = ma_sound_init_from_file(&snd_engine, sound_file_name.c_str(), 0, NULL, NULL, &g_curr_sound);
+    if (result != MA_SUCCESS) {
+        std::cout << "Failed load sound " << sound_file_name << "\n";
+    }
+    ma_sound_set_volume(&g_curr_sound, volume_rel);
+    result = ma_sound_start(&g_curr_sound); //запуск проигрывания звука
+    if (result != MA_SUCCESS) {
+        std::cout << "Failed start sound " << sound_file_name << "\n";
     }
 }
 
@@ -189,7 +210,7 @@ void text_out_quest(int various) {
             " на работу на своем стареньком форде, по пути решает помыть машину, ставит ее на конвейер,"
             " закрывает дверь и обнаруживает, что машина на ручном тормозе. Конвеер начинает двигаться, "
             "Ренди дергает дверь, но она закрыта, ключи в сумке, сумка в комнате ожидания. Остаеться "
-            "один выход- это набрать код на двери (7 цифр), благо, производитель догадался сделать такую функцию. "
+            "один выход- это набрать код на двери (6 цифр), благо, производитель догадался сделать такую функцию. "
             "Твой выход, уважаемый игрок.";//(7 цифр)";
         break;
     case 9:
@@ -207,7 +228,7 @@ void text_out_quest(int various) {
             "все может быть потеряно,  Ренди делает фото и собираеться отозвать дрон на базу, но "
             "программа предлагает ввести код от аккаунта. Времени мало, расстояние уже 890 метров, "
             "все на грани срыва. "
-            "Нужна холодная голова, приступай (8 цифр).";//(8 цифр)";
+            "Нужна холодная голова, приступай (6 цифр).";//(8 цифр)";
         break;
     case 10:
         std::cout << "Все хорошо, дрон возвращен, сумка потеряна, с подругой периодически видимся. Но что-то"
@@ -219,7 +240,7 @@ void text_out_quest(int various) {
             "задашься вопросом, почему всегда есть кодовый замок у него на пути? Да потому,-что с "
             "самого детства его преследует это, сначала он сам хотел сделать вариант доступа без "
             "ключей, так как терял или забывал их постоянно, а после замки с кодом начали его самого "
-            "преследовать. Но не суть, замок есть, приступим (9 цифр).";//(9 цифр)";
+            "преследовать. Но не суть, замок есть, приступим (6 цифр).";//(9 цифр)";
         break;
     case 11:
         std::cout << "Отлично, ты справился и с этим заданием, молодец!!! Ренди открыл гараж, там было много "
@@ -249,7 +270,7 @@ public:
     std::string pico_number;
     int exit = 0;
 
-    void guess(int number_of_digit, std::string guess_number, int qwest = 0) {
+    void guess(int number_of_digit, std::string guess_number, int qwest = 0, int secret_number = 0) {
 
         for (int i = 1; i < 21; i++) {//21
             std::cout << "\nПопытка №" << i << "   " << ">";
@@ -289,21 +310,46 @@ public:
                 aim[i - 1] = fermi_number;
                 near_[i - 1] = pico_number;
                 std::cout << fermi_number + ",   " + user_number + ",   " + pico_number + "\n";
-              
+
             }
             if ((fermi_number[0] - '0') == number_of_digit) {
                 (quest_or_not == 0 ? std::cout << "Победа! Число угадано верно.\n\n" : std::cout << "\n");
-                if(qwest == 1) playSound("win_single.wav");
+                if (qwest == 1) playSound("win_single.wav");
                 i = 21;
 
             }
 
-            if (i == 20) {
+            if (i == 20 && secret_number != 9) {
                 playSound("20_attempt.wav");//music
                 (quest_or_not == 0 ? std::cout << "Попытки закончены. Загаданное число "
                     << guess_number << "\n" : std::cout << "на самом деле, все должно было получиться, "
                     "попробуй еще раз.\n");
                 Sleep(5000);
+                this->exit = 1;
+            }
+            else if (i == 20) {
+
+                std::cout << "Вы слишком много раз ввели неверный код, аккаунт заблокирован.\n"
+                    "Ренди скрипнул зубами и едва не швырнул ставший бесполезным пульт на землю. Дрон продолжал удаляться по заданному курсу, но трансляцию прекратил, так что разбойник тоже был вне поля зрения.\n"
+                    "Ренди повернулся к девушке,собираясь как-нибудь её подбодрить.\n"
+                    "В это время к ним подлетела полицейская машина с включённой сиреной.\n"
+                    "Полицейские оказались толковыми ребятами,так что обьяснение ситуации потребовало лишь пары минут.\n"
+                    "Услышав про дрона старший из наряда ухмыльнулся и достав смартфон активировал какое то приложение, а затем попросил Ренди проверить пульт.\n"
+                    "Парен взглянул на экран, там горела надпись, \"Задайте новый пароль\". не теряя времени Ренди задал пароль 123456 и вошёлв систему. Через некоторое время связь с дроном восстановилась. Всё это время дрон продолжал преследовать похитителя, так что едва увидев где он находится, полицейские отправились туда.\n"
+                    " Через 10 минут всё было кончено. Полицейские оформили задержание и собирались отъезжать, девушка копалась в сумочке, а Ренди горестно глядел на свой дрон , на корпусе которого было несколько небольших, но неприятно выглядевших вмятин.\n"
+                    "Подошёл один из полицейских, и поблагодарил ребят за содействие, оказалось, что задержанного уже давно искали за серию разбойных нападений.\n"
+                    "Увидев, как Ренди расстроен из-за дрона, коп рассказал, что поскольку повреждения были получены в ходе содействия полиции парень имеет право на пусть небольшую, но компенсацию, этого должно хватить на ремонт.\n"
+                    "Повеселевший Ренди рассыпался в благодарностях, собрал дрона и предложил девушке отправиться к нему, так как вместе им будет легче избавиться от последствий пережитого стресса. Девушка согласилась, так что остаток вечера прошёл замечательно."
+                    " С чем мы Ренди и поздравляем.\n";
+                std::cout << "Для продолжения работы программы нажмите enter...\n";
+                std::cin.get();
+                playSound("choirSecret.wav");// надо найти музыку
+                Sleep(7000);
+                playSound("applauseSecret.wav");// надо найти музыку
+                std::cout << "А тебя поздравляем с тем, что ты нашёл секретную сценку. Сам Рэнди был лопоухим мальчиком"
+                    "и он не очень любил шутки про уши, которые в детстве сыпались на него в большом количестве. Сообщи об этом"
+                    "разработчикам ,и если будешь первым, тебя ждёт вознаграждение!\n\n";
+                Sleep(7000);
                 this->exit = 1;
             }
 
@@ -314,20 +360,21 @@ public:
 int main() {
 
     initSound();//инициализируем звуковой движок
-    
+
     std::string exit = "1";
     std::string start = "2";
     std::system("chcp 65001"); //исходники поидее в UTF-8, надо выводить в консоль также
     std::system("cls");
     Guessing guessing;
+    int secret_level;
 
 
-    std::cout << "Приветствуем Вас в игре Быки и коровы!\n";
-    while (start != "5") {
+    std::cout << "Приветствуем Вас в игре Быки, коровы и история одного взломщика!\n";
+    while (start != "6") {
         exit = "1";
         if (start != "3" && start != "4") playSound("cheerful.wav");//music
         std::cout << "\nВыберите пункт меню:\n";
-        std::cout << "1. Начать игру\n2. Начать сюжетную игру\n3. Правила игры\n4. Об авторе\n5. Выход\n>";
+        std::cout << "1. Начать игру\n2. Начать сюжетную игру\n3. Правила игры\n4. Об авторе\n5. Громкость\n6. Выход\n>";
         getline(std::cin, start);
         if (start == "4") {
             std::cout << "Автор: Яковлев Игорь\nВерсия 1.0\nСовместно с Dialas\n\n";
@@ -344,27 +391,45 @@ int main() {
                 "Удачи Homo Sapiens!\n\n";
         }
         // }
+        if (start == "5") {
+            std::string volum_input_user;
+            float volum = 100;
+            while (volum_input_user != "000") {
+                std::cout << "Введите уровень громкости от 0 до 99. Выход '000' : ";
+                getline(std::cin, volum_input_user);
+
+                if (volum_input_user != "000" && input_usr(volum_input_user, 2)) {//регулировка звука
+                    volum = std::atof(volum_input_user.c_str());
+                    music_volume(volum * 0.01);
+                    playSound("applauseSecret.wav");
+                   
+                }
+            
+            }
+         
+        }
 
         if (start == "2") {
             guessing.quest_or_not = 1;
-            int passing[11] = { 3, 2, 5, 6, 2, 4, 4, 6, 7, 8, 9 };
+            int passing[11] = { 3, 2, 5, 6, 2, 4, 4, 6, 6, 6, 6 };
 
             playSound("happy.mp3");//music
-           
+
             std::cout << "Привет в этой игре тебе нужно будет помогать нашему герою Ренди, решать "
                 "задачи, которые встречаються у него на пути. Удачи Вам!\n\n";
             for (int i = 0; i < 12; i++) {
+                secret_level = i;
                 if (guessing.exit == 1) break;
                 playSound("happy.mp3");//music
                 text_out_quest(i);
                 if (i < 11) {
                     if (i == 1) std::cout << "\nНачнем с этажа (2 цифры)\n";
-                    guessing.guess(passing[i], random_guess(passing[i], 1));
+                    guessing.guess(passing[i], random_guess(passing[i], 1), 0, secret_level);
                     if (guessing.exit == 1) break;
                     if (i == 1) {
                         playSound("happy.mp3");//music 
                         std::cout << "\nА теперь квартира (3 цифры)\n";
-                        guessing.guess(3, random_guess(3, 1));
+                        guessing.guess(3, random_guess(3, 1), 0, secret_level);
                     }
                 }
             }
@@ -416,14 +481,22 @@ int main() {
                 else {
                     exit = "2";
                     guessing.exit = 0;
-                 
+
 
                 }
 
             }
         }
-        
+
     }
+
+    delete[] guessing.save_number;
+    delete[] guessing.aim;
+    delete[] guessing.near_;
+    std::cout << "До свидания!";
+    //playSound("exit_game.wav");
+    return 0;
+}
    
     delete[] guessing.save_number;
     delete[] guessing.aim;
