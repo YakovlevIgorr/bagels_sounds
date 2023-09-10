@@ -365,6 +365,7 @@ int main() {
     std::string start = "2";
     std::system("chcp 65001"); //исходники поидее в UTF-8, надо выводить в консоль также
     std::system("cls");
+    float volum = 100;
     Guessing guessing;
     int secret_level;
 
@@ -372,16 +373,24 @@ int main() {
     std::cout << "Приветствуем Вас в игре Быки, коровы и история одного взломщика!\n";
     while (start != "6") {
         exit = "1";
-        if (start != "3" && start != "4") playSound("cheerful.wav");//music
+        if (start != "3" && start != "4") {
+            if (volum > 50) {
+                music_volume((0.5));
+                playSound("cheerful.wav");
+               
+            }else playSound("cheerful.wav");
+        }//music
         std::cout << "\nВыберите пункт меню:\n";
         std::cout << "1. Начать игру\n2. Начать сюжетную игру\n3. Правила игры\n4. Об авторе\n5. Громкость\n6. Выход\n>";
         getline(std::cin, start);
+        music_volume(volum * 0.01);
         if (start == "4") {
             std::cout << "Автор: Яковлев Игорь\nВерсия 1.0\nСовместно с Dialas\n\n";
+           
         }
         if (start == "3") {
             std::cout << "Компьютер загадывает несколько цифр, количество цифр задает игрок. После каждой "
-                "попытки компьтер выводит подсказку о угаданных числах, в виде звуковых сигналов. "
+                "попытки компьютер выводит подсказку о угаданных числах, в виде звуковых сигналов. "
                 "(звук1)(корова)- если введенная "
                 "цифра есть, но находиться на другом месте, (звук2)(быки) - если введенная  цифра есть и "
                 "ее место угадано, нет звука - нет таких цифр. Для вывода истории своих попыток нужно "
@@ -393,7 +402,7 @@ int main() {
         // }
         if (start == "5") {
             std::string volum_input_user;
-            float volum = 100;
+            //float volum = 100;
             while (volum_input_user != "000") {
                 std::cout << "Введите уровень громкости от 0 до 99. Выход '000' : ";
                 getline(std::cin, volum_input_user);
